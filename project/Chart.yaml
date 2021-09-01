@@ -32,6 +32,6 @@ dependencies:
   - name: elastic
     version: 0.1.0
     condition: elastic.enabled
-#  - name: kibana
-#    version: 0.1.0
-#    condition: redis.enabled
+  - name: kibana
+    version: 0.1.0
+    condition: kibana.enabled
