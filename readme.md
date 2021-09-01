@@ -1,6 +1,6 @@
 # K8s training capstone project
 
-###The task for the project is the following:
+### The task for the project is the following:
 
 You need to migrate a project from docker-compose to Kubernetes. With provided docker-compose.yaml you have to create all necessary specifications for Kubernetes deployment.
 
