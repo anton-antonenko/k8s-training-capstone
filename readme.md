@@ -67,3 +67,8 @@ services:
     ports:
       - '5601:5601'
 ```
+
+To deploy execute: 
+```
+helm install capstone ./project
+```
