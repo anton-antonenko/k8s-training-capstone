@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "redis.fullname" . }}-master-deployment
+  labels:
+    app: {{ template "redis.fullname" . }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "redis.fullname" . }}
+      role: master
+  template:
+    metadata:
+      labels:
+        app: {{ template "redis.fullname" . }}
+        role: master
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - name: redis
+              containerPort: {{ .Values.service.port }}
+          resources:
+          {{ toYaml .Values.resources | indent 10 }}

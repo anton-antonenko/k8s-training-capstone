@@ -1,0 +1,40 @@
+# Default values for data-processor.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+service:
+  type: ClusterIP
+  host: web-server
+  port: 8085
+
+image:
+  repository: quay.io/myafk/interactive
+  tag: stable
+  pullPolicy: IfNotPresent
+
+autoscaling:
+  enabled: false
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hosts:
+    - host: localhost
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  path: /web(/|$)(.*)
+
+redis:
+  master:
+    host: "capstone-redis-master"
+  slave:
+    host: "capstone-redis-slave"
+
+resources: {}
+#  requests:
+#    cpu: 100m
+#    memory: 500Mi
+#  limits:
+#    cpu: 150m
+#    memory: 750Mi

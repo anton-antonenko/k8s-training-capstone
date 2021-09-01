@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "elastic.fullname" . }}-headless
+  labels:
+    appname: {{ .Values.global.appname }}
+    app: {{ template "elastic.fullname" . }}
+  {{- include "elastic.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  clusterIP: None
+  selector:
+    app: {{ template "elastic.fullname" . }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      name: {{ include "elastic.fullname" . }}
+

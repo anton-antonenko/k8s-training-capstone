@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "web-server.fullname" . }}-deployment
+  labels:
+    app: {{ template "web-server.fullname" . }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "web-server.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "web-server.fullname" . }}
+        appname: {{ .Values.global.appname }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: [ "interactive", "ingress" ]
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: REDIS_SLAVE_HOST
+              value: {{ .Values.redis.slave.host }}
+            - name: REDIS_MASTER_HOST
+              value: {{ .Values.redis.master.host }}
+            - name: ELASTICSEARCH_HOSTS
+              value: {{ .Values.global.elastic.hosts | quote }}
+            - name: KUBERNETES_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: project-config
+                  key: KUBERNETES_SERVICE_HOST
+            - name: KUBERNETES_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: project-config
+                  key: KUBERNETES_SERVICE_PORT
+          resources:
+  {{ toYaml .Values.resources | indent 10 }}

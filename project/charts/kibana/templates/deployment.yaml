@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "kibana.fullname" . }}-deployment
+  labels:
+    app: {{ template "kibana.fullname" . }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "kibana.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kibana.fullname" . }}
+        appname: {{ .Values.global.appname }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: kibana
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: {{ .Values.global.elastic.hosts | quote }}
+          resources:
+  {{- toYaml .Values.resources | nindent 12 }}

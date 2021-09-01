@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "elastic.fullname" . }}-cluster
+  labels:
+    app: {{ template "elastic.fullname" . }}
+    appname: {{ .Values.global.appname }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  serviceName: {{ template "elastic.fullname" . }}-headless
+  selector:
+    matchLabels:
+      app: {{ template "elastic.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "elastic.fullname" . }}
+        appname: {{ .Values.global.appname }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: elastic
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: node.name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: discovery.seed_hosts
+              value: {{ template "elastic.fullname" . }}-headless
+            - name: cluster.initial_master_nodes
+              value: {{ .Values.conf.initial_master_nodes }}
+            - name: cluster.name
+              value: {{ .Values.conf.cluster_name }}
+            - name: bootstrap.memory_lock
+              value: {{ .Values.conf.bootstrap_memory_lock | quote }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

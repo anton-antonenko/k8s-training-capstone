@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "redis.fullname" . }}-slave-deployment
+  labels:
+    app: {{ template "redis.fullname" . }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "redis.fullname" . }}
+      role: slave
+  template:
+    metadata:
+      labels:
+        app: {{ template "redis.fullname" . }}
+        role: slave
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}"
+          command: [ "bash", "-c", "redis-server --slaveof $REDIS_MASTER_HOST 6379" ]
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - name: redis
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: REDIS_MASTER_HOST
+              value: {{ template "redis.fullname" . }}-master
+          resources:
+  {{ toYaml .Values.resources | indent 10 }}

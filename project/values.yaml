@@ -1,0 +1,26 @@
+# Default values for serin.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  appname: capstone
+  elastic:
+    hosts: "http://capstone-elastic-headless:9200"
+
+web-server:
+  enabled: true
+  service:
+    port: 8085
+
+redis:
+  enabled: true
+
+elastic:
+  enabled: true
+
+kibana:
+  enabled: true
+
+configMapVals:
+  KUBERNETES_SERVICE_HOST: "any string?"
+  KUBERNETES_SERVICE_PORT: "any thing?"
